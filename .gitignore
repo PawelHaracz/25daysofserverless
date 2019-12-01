@@ -291,6 +291,9 @@ paket-files/
 .idea/
 *.sln.iml
 
+**/.idea
+**/.vscode
+
 # CodeRush
 .cr/
 
@@ -328,3 +331,5 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+
+**/.user
