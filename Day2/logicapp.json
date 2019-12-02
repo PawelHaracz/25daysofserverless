@@ -1,0 +1,252 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "Delay": {
+                "inputs": {
+                    "interval": {
+                        "count": 25,
+                        "unit": "Minute"
+                    }
+                },
+                "runAfter": {
+                    "First_action": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Wait"
+            },
+            "Delay_2": {
+                "inputs": {
+                    "interval": {
+                        "count": 5,
+                        "unit": "Minute"
+                    }
+                },
+                "runAfter": {
+                    "Second_action": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Wait"
+            },
+            "Delay_3": {
+                "inputs": {
+                    "interval": {
+                        "count": 5,
+                        "unit": "Minute"
+                    }
+                },
+                "runAfter": {
+                    "Third_action": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Wait"
+            },
+            "Delay_4": {
+                "inputs": {
+                    "interval": {
+                        "count": 4,
+                        "unit": "Minute"
+                    }
+                },
+                "runAfter": {
+                    "Fourth_action": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Wait"
+            },
+            "Delay_5": {
+                "inputs": {
+                    "interval": {
+                        "count": 1,
+                        "unit": "Minute"
+                    }
+                },
+                "runAfter": {
+                    "Fifth_action": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Wait"
+            },
+            "Delay_6": {
+                "inputs": {
+                    "interval": {
+                        "count": 5,
+                        "unit": "Minute"
+                    }
+                },
+                "runAfter": {
+                    "Sixth_action": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Wait"
+            },
+            "Delay_7": {
+                "inputs": {
+                    "interval": {
+                        "count": 4,
+                        "unit": "Minute"
+                    }
+                },
+                "runAfter": {
+                    "Seventh_action": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Wait"
+            },
+            "Eigth_action": {
+                "inputs": {
+                    "body": {
+                        "message": "return to kitchen, take a break!",
+                        "time": "@utcNow('HH:mm')"
+                    },
+                    "function": {
+                        "id": "/subscriptions/<your-subscription>/resourceGroups/25dayschallenge/providers/Microsoft.Web/sites/Day2ph/functions/SendMessage"
+                    }
+                },
+                "runAfter": {
+                    "Delay_7": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Function"
+            },
+            "Fifth_action": {
+                "inputs": {
+                    "body": {
+                        "message": "return to kitchen, fill two more cups",
+                        "time": "@utcNow('HH:mm')"
+                    },
+                    "function": {
+                        "id": "/subscriptions/<your-subscription>/resourceGroups/25dayschallenge/providers/Microsoft.Web/sites/Day2ph/functions/SendMessage"
+                    }
+                },
+                "runAfter": {
+                    "Delay_4": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Function"
+            },
+            "First_action": {
+                "inputs": {
+                    "body": {
+                        "message": " start the coffee, set out 4 cups",
+                        "time": "@utcNow('HH:mm')"
+                    },
+                    "function": {
+                        "id": "/subscriptions/<your-subscription>/resourceGroups/25dayschallenge/providers/Microsoft.Web/sites/Day2ph/functions/SendMessage"
+                    }
+                },
+                "runAfter": {},
+                "type": "Function"
+            },
+            "Fourth_action": {
+                "inputs": {
+                    "body": {
+                        "message": "deliver the coffee to Mom and Dad",
+                        "time": "@utcNow('HH:mm')"
+                    },
+                    "function": {
+                        "id": "/subscriptions/<your-subscription>/resourceGroups/25dayschallenge/providers/Microsoft.Web/sites/Day2ph/functions/SendMessage"
+                    }
+                },
+                "runAfter": {
+                    "Delay_3": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Function"
+            },
+            "Second_action": {
+                "inputs": {
+                    "body": {
+                        "message": "pour two cups",
+                        "time": "@utcNow('HH:mm')"
+                    },
+                    "function": {
+                        "id": "/subscriptions/<your-subscription>/resourceGroups/25dayschallenge/providers/Microsoft.Web/sites/Day2ph/functions/SendMessage"
+                    }
+                },
+                "runAfter": {
+                    "Delay": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Function"
+            },
+            "Seventh_action": {
+                "inputs": {
+                    "body": {
+                        "message": "deliver the coffee to Sister and Brothe",
+                        "time": "@utcNow('HH:mm')"
+                    },
+                    "function": {
+                        "id": "/subscriptions/<your-subscription>/resourceGroups/25dayschallenge/providers/Microsoft.Web/sites/Day2ph/functions/SendMessage"
+                    }
+                },
+                "runAfter": {
+                    "Delay_6": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Function"
+            },
+            "Sixth_action": {
+                "inputs": {
+                    "body": {
+                        "message": "relight the candles",
+                        "time": "@utcNow('HH:mm')"
+                    },
+                    "function": {
+                        "id": "/subscriptions/<your-subscription>/resourceGroups/25dayschallenge/providers/Microsoft.Web/sites/Day2ph/functions/SendMessage"
+                    }
+                },
+                "runAfter": {
+                    "Delay_5": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Function"
+            },
+            "Third_action": {
+                "inputs": {
+                    "body": {
+                        "message": "light the candles",
+                        "time": "@utcNow('HH:mm')"
+                    },
+                    "function": {
+                        "id": "/subscriptions/<your-subscription>/resourceGroups/25dayschallenge/providers/Microsoft.Web/sites/Day2ph/functions/SendMessage"
+                    }
+                },
+                "runAfter": {
+                    "Delay_2": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Function"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "parameters": {},
+        "triggers": {
+            "Recurrence": {
+                "recurrence": {
+                    "frequency": "Day",
+                    "interval": 1,
+                    "startTime": "2019-12-13T08:00:00Z",
+                    "timeZone": "W. Europe Standard Time"
+                },
+                "type": "Recurrence"
+            }
+        }
+    },
+    "parameters": {}
+}
