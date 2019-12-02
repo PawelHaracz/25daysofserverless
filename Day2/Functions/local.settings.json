@@ -6,7 +6,7 @@
         "AzureSignalRConnectionString" : ""
     },
     "Host": {
-        "CORS": "https://localhost:5001",
+        "CORS": "",
         "CORSCredentials": true
     }
 }
