@@ -1,0 +1,44 @@
+﻿@page "/fetchdata"
+@inject HttpClient Http
+
+<h1>Daily Commintst</h1>
+
+
+@if (_entities == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>PNG</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var entity in _entities)
+            {
+                <tr>
+                    <th><img id="@entity.Name" src="@entity.Url"/></th>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+
+        IEnumerable<GithubPng> _entities;
+        protected override async Task OnInitializedAsync()
+        {
+            _entities = await Http.GetJsonAsync<GithubPng[]>("https://day3ph.azurewebsites.net/api/TodayPng");
+        }
+
+        public class GithubPng
+        {
+            public string Name { get; set; }
+            public string Day { get; set; }
+            public string Url { get; set; }
+        }
+    }

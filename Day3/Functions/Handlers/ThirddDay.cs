@@ -8,9 +8,11 @@ using Day3.Extensions;
 using Day3.Model;
 using Day3.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -24,6 +26,7 @@ namespace Day3.Handlers
         private readonly JsonSerializerSettings _deserializerSettings;
         private const string GitHubEventName = "X-GitHub-Event";
         private const string DownloadPng = "download-png";
+        private const string PetsTable = "Pets";
 
         public ThirdDay(IPngConverter pngConverter, IPngService pngService)
         {
@@ -80,7 +83,7 @@ namespace Day3.Handlers
             [QueueTrigger(DownloadPng, Connection = "AzureWebJobsStorage")]
             DownloadPngMessage message,
             IBinder binder,
-            [Table("Pets", Connection = "AzureWebJobsStorage")]
+            [Table(PetsTable, Connection = "AzureWebJobsStorage")]
             IAsyncCollector<PetEntity> tables,
             ILogger log)
         {
@@ -101,7 +104,7 @@ namespace Day3.Handlers
                 await stream.CopyToAsync(blob);
                 await tables.AddAsync(new PetEntity()
                 {
-                    BlobUrl = $"{Environment.GetEnvironmentVariable("AzureWebJobsStorage", EnvironmentVariableTarget.Process)}/{blobName}",
+                    BlobUrl = $"https://{GetAccountName()}.blob.core.windows.net/{blobName}",
                     PartitionKey = DateTime.UtcNow.Date.ToString("yy-MM-dd"),
                     RowKey = message.Name
                 });
@@ -109,6 +112,42 @@ namespace Day3.Handlers
                 await tables.FlushAsync();
                 log.LogInformation("Saved Blob and reference {name}", message.Name);
             }
+        }
+
+        [FunctionName(nameof(TodayPng))]
+        public async Task<IActionResult> TodayPng(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)]  HttpRequest req,
+            [Table(PetsTable , Connection = "AzureWebJobsStorage")]CloudTable  cloudTable)
+        {
+            TableQuerySegment<PetEntity> segment = null;
+            var results = new List<PetEntity>();
+            while (segment == null || segment.ContinuationToken != null)
+            {
+                var query =
+                    new TableQuery<PetEntity>()
+                        .Where(TableQuery.GenerateFilterCondition(
+                            nameof(TableEntity.PartitionKey),
+                            QueryComparisons.Equal,
+                            DateTime.UtcNow.ToString("yy-MM-dd")));
+                
+                segment = await cloudTable.ExecuteQuerySegmentedAsync(query, segment?.ContinuationToken);
+                results.AddRange(segment.Results.AsEnumerable());
+            }
+
+            return new OkObjectResult(results.Select(r => new
+            {
+                Name = r.RowKey,
+                Day = r.PartitionKey,
+                Url = r.BlobUrl
+            }));
+        }
+
+        private string GetAccountName()
+        {
+            var connectionString = Environment.GetEnvironmentVariable("AzureWebJobsStorage", EnvironmentVariableTarget.Process);
+            var accountName = connectionString.Split(";").Where(s => s.StartsWith("AccountName="))
+                .Select(e => e.Replace("AccountName=", string.Empty));
+            return accountName.Single();
         }
     }
 }
