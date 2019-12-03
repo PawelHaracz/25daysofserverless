@@ -1,7 +1,7 @@
 ﻿@page "/fetchdata"
 @inject HttpClient Http
 
-<h1>Daily Commintst</h1>
+<h1>Daily Commits</h1>
 
 
 @if (_entities == null)
@@ -20,7 +20,7 @@ else
             @foreach (var entity in _entities)
             {
                 <tr>
-                    <th><img id="@entity.Name" src="@entity.Url"/></th>
+                    <th><img id="@entity.Name" src="@entity.Url" style="max-width: 80%; max-height: 500px;"/></th>
                 </tr>
             }
         </tbody>
