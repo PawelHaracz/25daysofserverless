@@ -1,0 +1,170 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "For_each": {
+                "actions": {
+                    "Append_to_array_variable": {
+                        "inputs": {
+                            "name": "responses",
+                            "value": {
+                                "politenessScore": "@if(greater(float(body('Detect_Sentiment')?['score']), float('0.5')), 'nice', 'naughty')\n",
+                                "text": "@body('Translate_text_2')",
+                                "who": "@items('For_each')['who']"
+                            }
+                        },
+                        "runAfter": {
+                            "Detect_Sentiment": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "AppendToArrayVariable"
+                    },
+                    "Detect_Sentiment": {
+                        "inputs": {
+                            "body": {
+                                "language": "en",
+                                "text": "@body('Translate_text_2')"
+                            },
+                            "host": {
+                                "connection": {
+                                    "name": "@parameters('$connections')['cognitiveservicestextanalytics']['connectionId']"
+                                }
+                            },
+                            "method": "post",
+                            "path": "/text/analytics/v2.1/sentiment"
+                        },
+                        "runAfter": {
+                            "Translate_text_2": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "ApiConnection"
+                    },
+                    "Detect_language_2": {
+                        "inputs": {
+                            "body": {
+                                "Text": "@items('For_each')?['message']"
+                            },
+                            "host": {
+                                "connection": {
+                                    "name": "@parameters('$connections')['translatorv2']['connectionId']"
+                                }
+                            },
+                            "method": "post",
+                            "path": "/Detect"
+                        },
+                        "runAfter": {},
+                        "type": "ApiConnection"
+                    },
+                    "Translate_text_2": {
+                        "inputs": {
+                            "body": {
+                                "Text": "@items('For_each')?['message']"
+                            },
+                            "host": {
+                                "connection": {
+                                    "name": "@parameters('$connections')['translatorv2']['connectionId']"
+                                }
+                            },
+                            "method": "post",
+                            "path": "/Translate",
+                            "queries": {
+                                "from": "@body('Detect_language_2')?['Code']",
+                                "to": "en"
+                            }
+                        },
+                        "runAfter": {
+                            "Detect_language_2": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "ApiConnection"
+                    }
+                },
+                "foreach": "@triggerBody()",
+                "runAfter": {
+                    "Initialize_variable": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Foreach"
+            },
+            "Initialize_variable": {
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "responses",
+                            "type": "array"
+                        }
+                    ]
+                },
+                "runAfter": {},
+                "type": "InitializeVariable"
+            },
+            "Response": {
+                "inputs": {
+                    "body": "@variables('responses')",
+                    "statusCode": 200
+                },
+                "kind": "Http",
+                "runAfter": {
+                    "For_each": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Response"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "parameters": {
+            "$connections": {
+                "defaultValue": {},
+                "type": "Object"
+            }
+        },
+        "triggers": {
+            "manual": {
+                "inputs": {
+                    "method": "POST",
+                    "schema": {
+                        "items": {
+                            "properties": {
+                                "message": {
+                                    "type": "string"
+                                },
+                                "who": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "who"
+                            ],
+                            "type": "object"
+                        },
+                        "type": "array"
+                    }
+                },
+                "kind": "Http",
+                "type": "Request"
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "value": {
+                "cognitiveservicestextanalytics": {
+                    "connectionId": "/subscriptions/<YOUR-SUBSCRIPTION>8/resourceGroups/25dayschallenge/providers/Microsoft.Web/connections/cognitiveservicestextanalytics",
+                    "connectionName": "cognitiveservicestextanalytics",
+                    "id": "/subscriptions/<YOUR-SUBSCRIPTION>8/providers/Microsoft.Web/locations/westeurope/managedApis/cognitiveservicestextanalytics"
+                },
+                "translatorv2": {
+                    "connectionId": "/subscriptions/<YOUR-SUBSCRIPTION>8/resourceGroups/25dayschallenge/providers/Microsoft.Web/connections/translatorv2",
+                    "connectionName": "translatorv2",
+                    "id": "/subscriptions/<YOUR-SUBSCRIPTION>8/providers/Microsoft.Web/locations/westeurope/managedApis/translatorv2"
+                }
+            }
+        }
+    }
+}
