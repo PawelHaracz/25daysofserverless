@@ -1,0 +1,13 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "AzureWebJobsDashboard": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "Slack__WebHookUrl": "",
+    "Luis__LuisSubscriptionKey": "",
+    "Luis__LuisAppId": "",
+    "Luis__LuisUri": ""
+    
+  }
+}
