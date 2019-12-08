@@ -4,11 +4,6 @@
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "AzureWebJobsDashboard": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-    "AzureSignalRConnectionString": "Endpoint=https://day8ph.service.signalr.net;AccessKey=x3/cake7x6D7AyHHQpVTiVUX55Lt6IDPrUymbwzvkD0=;Version=1.0;"
-  },
-  "Host": {
-    "LocalHttpPort": 7071,
-    "CORS": "http://localhost:8080,http://localhost:80,https://day8ph.service.signalr.net",
-    "CORSCredentials": true
+    "AzureSignalRConnectionString": ""
   }
 }
