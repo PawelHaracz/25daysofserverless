@@ -68,7 +68,7 @@ namespace Day8.Entities
                 Arguments = new[] { new
                 {
                     Name = Entity.Current.EntityKey,
-                    Status = (int)Status
+                    Status = (int)this.Status
                 } }
             });
         }

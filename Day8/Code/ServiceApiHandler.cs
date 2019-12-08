@@ -85,7 +85,7 @@ namespace Day8
             
             var entityId = new EntityId(nameof(ServiceAggregator), entityKey);
 
-            var stat = status == 0 ? Status.Open : Status.Ongoing;
+            var stat = status == 0 ? Status.Closed : Status.Ongoing;
             await entityClient.SignalEntityAsync<IServiceAggregator>(entityId, proxy => proxy.ChangeState(new StatusCommand(stat)));
             await entityClient.SignalEntityAsync<IEntitiesAggregator>(new EntityId(nameof(EntitiesAggregator), EntitiesAggregator.EntityId),
                 proxy => proxy.Add(entityKey));

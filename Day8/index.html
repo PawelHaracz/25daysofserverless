@@ -32,12 +32,13 @@
         <div v-if="ready">
             <transition-group name="slide-fade" tag="div">
                 <div class="row" v-for="app in statusApps" v-bind:key="app.name">
+                    <h3>{{app.displayName}}: </h1>
                     <div class="col-sm">
                         <hr />
                         <div>
                             <div style="display: inline-block; padding-left: 12px;">
                                 <div>
-                                    <span class="text-info small">
+                                    <span class="text-info">
                                         <strong v-if="app.status == 1" >
                                             close
                                         </strong>
@@ -71,7 +72,7 @@
             params:{},
             headers: {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': 'true'}
         };
-        const serviceUrl = 'https://day8ph.azurewebsites.net/api';
+        const serviceUrl = 'https://day8phwin.azurewebsites.net/api';
         const app = new Vue({
           el: '#app',
           data: data,
@@ -80,13 +81,19 @@
           created: function(){
             axios.get(serviceUrl + "/Service/", config)
                 .then(function(response){
-                    for(var i =0; i < response.Length; i++)
+                    for(var i =0; i < response.data.length; i++)
                     {
-                        axios.get(serviceUrl +"/Service/"+ response[i], config)
+                        axios.get(serviceUrl +"/Service/"+  response.data[i], config)
                             .then(function(r){
-                                data.statusApps.push(r);
+                                var url = r.config.url.split('/');
+                                data.statusApps.push({
+                                    name: url[url.length -1],
+                                    displayName: r.data.name,
+                                    status: r.data.status
+                                });
                             });
                     }
+                    data.ready = true;
                 });
           }
         });
@@ -107,7 +114,19 @@
         let counter = 0;
  
         function statusChanged(message) {
-            data.statusApps.push(message)
+            if(message.Status === undefined){
+                return;
+            }
+            var item = data.statusApps.filter(function(d){return d.name == message.Name});
+            if(item === undefined){
+                return;
+            }
+            for(var i = 0; item.length; i++){
+                if(item[i].hasOwnProperty("status"))
+                {
+                    item[i].status = message.Status
+                }
+            }
     }
     
     </script>
