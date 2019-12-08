@@ -1,0 +1,116 @@
+<html>
+ 
+<head>
+     <!--Adapted (aka hacked) from: https://azure-samples.github.io/signalr-service-quickstart-serverless-chat/demo/chat-v2/ -->
+ 
+    <title>25 days challenge - Day2</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css">
+ 
+    <style>
+        .slide-fade-enter-active, .slide-fade-leave-active {
+            transition: all 1s ease;
+        }
+ 
+        .slide-fade-enter, .slide-fade-leave-to {
+            height: 0px;
+            overflow-y: hidden;
+            opacity: 0;
+        }
+    </style>
+</head>
+ 
+<body>
+    <p>&nbsp;</p>
+    <div id="app" class="container">
+        <h3>Status</h3>
+ 
+        <div class="row" v-if="!ready">
+            <div class="col-sm">
+                <div>Loading...</div>
+            </div>
+        </div>
+        <div v-if="ready">
+            <transition-group name="slide-fade" tag="div">
+                <div class="row" v-for="app in statusApps" v-bind:key="app.name">
+                    <div class="col-sm">
+                        <hr />
+                        <div>
+                            <div style="display: inline-block; padding-left: 12px;">
+                                <div>
+                                    <span class="text-info small">
+                                        <strong v-if="app.status == 1" >
+                                            close
+                                        </strong>
+                                        <strong v-if="app.status == 0" >
+                                                Open
+                                        </strong>
+                                        <strong v-if="app.status == 2" >
+                                                On going
+                                        </strong>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </transition-group>
+        </div>
+      
+    </div>
+ 
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@aspnet/signalr@1.1.2/dist/browser/signalr.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.18.0/dist/axios.min.js"></script>
+ 
+    <script>
+        const data = {
+          statusApps: [],
+          ready: false
+        };
+        const config = {
+            params:{},
+            headers: {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Credentials': 'true'}
+        };
+        const serviceUrl = 'https://day8ph.azurewebsites.net/api';
+        const app = new Vue({
+          el: '#app',
+          data: data,
+          methods: {
+          },
+          created: function(){
+            axios.get(serviceUrl + "/Service/", config)
+                .then(function(response){
+                    for(var i =0; i < response.Length; i++)
+                    {
+                        axios.get(serviceUrl +"/Service/"+ response[i], config)
+                            .then(function(r){
+                                data.statusApps.push(r);
+                            });
+                    }
+                });
+          }
+        });
+ 
+        const connection = new signalR.HubConnectionBuilder()
+          .withUrl(serviceUrl)
+          .configureLogging(signalR.LogLevel.Information)
+          .build();
+          
+        connection.on('newStatus', statusChanged);
+        connection.onclose(() => console.log('disconnected'));
+ 
+        console.log('connecting...');
+        connection.start()
+            .then(() => data.ready = true)
+            .catch(console.error);
+ 
+        let counter = 0;
+ 
+        function statusChanged(message) {
+            data.statusApps.push(message)
+    }
+    
+    </script>
+</body>
+ 
+</html>

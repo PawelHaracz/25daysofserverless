@@ -11,7 +11,7 @@ namespace Day8
     {
         [FunctionName(nameof(HealthCheck))]
         public HttpResponseMessage HealthCheck(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]  HttpRequestMessage req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)]  HttpRequestMessage req,
             [Table("MyTable", "SantaService","1",  Connection = "AzureWebJobsStorage")] ServiceConfigurationTableEntity serviceConfigurationTableEntity,
             ILogger log)
         {
