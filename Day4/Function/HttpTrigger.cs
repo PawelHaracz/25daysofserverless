@@ -92,30 +92,32 @@ namespace Day4
             {
                 log.LogInformation("Starting processing function {functionName}", nameof(Post));
 
-                using var streamReader = new StreamReader(req.Body);
-                var requestBody = await streamReader.ReadToEndAsync();
-                var model = JsonConvert.DeserializeObject<Food>(requestBody);
-                
-                if(partyModel.FoodList.Any(c => c.Name == model.Name && string.Equals(c.Owner, model.Name, StringComparison.InvariantCulture)))
+                using (var streamReader = new StreamReader(req.Body))
                 {
-                    return new OkObjectResult(partyModel); 
-                }
-                
-                partyModel.FoodList.Add(model);
-                var collectionUri = UriFactory.CreateDocumentUri("Parties", "Parties", id);
-                var response = await client.ReplaceDocumentAsync(
-                    collectionUri, 
-                    partyModel, 
-                    new RequestOptions()
-                    {
-                        PartitionKey = new PartitionKey(organizer),
-                        JsonSerializerSettings = new JsonSerializerSettings()
-                        {
-                            ContractResolver = new CamelCasePropertyNamesContractResolver()
-                        }
-                    });
+                    var requestBody = await streamReader.ReadToEndAsync();
+                    var model = JsonConvert.DeserializeObject<Food>(requestBody);
 
-                return new OkObjectResult(partyModel);
+                    if (partyModel.FoodList.Any(c => c.Name == model.Name && string.Equals(c.Owner, model.Name, StringComparison.InvariantCulture)))
+                    {
+                        return new OkObjectResult(partyModel);
+                    }
+
+                    partyModel.FoodList.Add(model);
+                    var collectionUri = UriFactory.CreateDocumentUri("Parties", "Parties", id);
+                    var response = await client.ReplaceDocumentAsync(
+                        collectionUri,
+                        partyModel,
+                        new RequestOptions()
+                        {
+                            PartitionKey = new PartitionKey(organizer),
+                            JsonSerializerSettings = new JsonSerializerSettings()
+                            {
+                                ContractResolver = new CamelCasePropertyNamesContractResolver()
+                            }
+                        });
+
+                    return new OkObjectResult(partyModel);
+                }
             }
             catch (Exception e)
             {
