@@ -33,7 +33,7 @@ namespace Day4
             try
             {
                 log.LogInformation("Starting processing function {functionName}", nameof(GetList));
-               
+
                 return new OkObjectResult(parties.Select(p => new
                 {
                     p.Description,
@@ -47,7 +47,7 @@ namespace Day4
                 throw;
             }
         }
-        
+
         [FunctionName(nameof(Get))]
         public IActionResult Get(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "parties/{organizer}/{id}")]
@@ -63,7 +63,7 @@ namespace Day4
             try
             {
                 log.LogInformation("Starting processing function {functionName}", nameof(Get));
-               
+
                 return new OkObjectResult(partyModel);
             }
             catch (Exception e)
@@ -72,7 +72,7 @@ namespace Day4
                 throw;
             }
         }
-        
+
         [FunctionName(nameof(Post))]
         public async Task<IActionResult> Post(
             [HttpTrigger (AuthorizationLevel.Anonymous, "post", Route = "parties/{organizer}/{id}")]
@@ -92,32 +92,30 @@ namespace Day4
             {
                 log.LogInformation("Starting processing function {functionName}", nameof(Post));
 
-                using (var streamReader = new StreamReader(req.Body))
+                using var streamReader = new StreamReader(req.Body);
+                var requestBody = await streamReader.ReadToEndAsync();
+                var model = JsonConvert.DeserializeObject<Food>(requestBody);
+
+                if(partyModel.FoodList.Any(c => c.Name == model.Name && string.Equals(c.Owner, model.Name, StringComparison.InvariantCulture)))
                 {
-                    var requestBody = await streamReader.ReadToEndAsync();
-                    var model = JsonConvert.DeserializeObject<Food>(requestBody);
-
-                    if (partyModel.FoodList.Any(c => c.Name == model.Name && string.Equals(c.Owner, model.Name, StringComparison.InvariantCulture)))
-                    {
-                        return new OkObjectResult(partyModel);
-                    }
-
-                    partyModel.FoodList.Add(model);
-                    var collectionUri = UriFactory.CreateDocumentUri("Parties", "Parties", id);
-                    var response = await client.ReplaceDocumentAsync(
-                        collectionUri,
-                        partyModel,
-                        new RequestOptions()
-                        {
-                            PartitionKey = new PartitionKey(organizer),
-                            JsonSerializerSettings = new JsonSerializerSettings()
-                            {
-                                ContractResolver = new CamelCasePropertyNamesContractResolver()
-                            }
-                        });
-
-                    return new OkObjectResult(partyModel);
+                    return new OkObjectResult(partyModel); 
                 }
+
+                partyModel.FoodList.Add(model);
+                var collectionUri = UriFactory.CreateDocumentUri("Parties", "Parties", id);
+                var response = await client.ReplaceDocumentAsync(
+                    collectionUri, 
+                    partyModel, 
+                    new RequestOptions()
+                    {
+                        PartitionKey = new PartitionKey(organizer),
+                        JsonSerializerSettings = new JsonSerializerSettings()
+                        {
+                            ContractResolver = new CamelCasePropertyNamesContractResolver()
+                        }
+                    });
+
+                return new OkObjectResult(partyModel);
             }
             catch (Exception e)
             {
@@ -125,7 +123,7 @@ namespace Day4
                 throw;
             }
         }
-        
+
         [FunctionName(nameof(Delete))]
         public async Task<IActionResult> Delete(
             [HttpTrigger (AuthorizationLevel.Anonymous, "delete", Route = "parties/{organizer}/{id}/{name}")]
@@ -145,13 +143,13 @@ namespace Day4
             try
             {
                 log.LogInformation("Starting processing function {functionName}", nameof(Delete));
-                
+
                 var toDelete = partyModel.FoodList.FirstOrDefault(c => c.Name == name);
                 if (toDelete is null)
                 {
                     return new OkObjectResult(partyModel); 
                 }
-                
+
                 partyModel.FoodList.Remove(toDelete);
                 var collectionUri = UriFactory.CreateDocumentUri("Parties", "Parties", id);
                 var response = await client.ReplaceDocumentAsync(
@@ -162,7 +160,7 @@ namespace Day4
                         PartitionKey = new PartitionKey(organizer),
                         JsonSerializerSettings = new JsonSerializerSettings()
                         {
-                            
+
                         }
                     });
 
@@ -175,4 +173,4 @@ namespace Day4
             }
         }
     }
-}
+} 
