@@ -1,0 +1,106 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "For_each": {
+                "actions": {
+                    "Compose": {
+                        "inputs": {
+                            "body": "@items('For_each')?['OriginalTweet']?['TweetText']"
+                        },
+                        "runAfter": {},
+                        "type": "Compose"
+                    },
+                    "Create_blob": {
+                        "inputs": {
+                            "body": "@outputs('Compose')",
+                            "headers": {
+                                "Content-Type": "application/json"
+                            },
+                            "host": {
+                                "connection": {
+                                    "name": "@parameters('$connections')['azureblob']['connectionId']"
+                                }
+                            },
+                            "method": "post",
+                            "path": "/datasets/default/files",
+                            "queries": {
+                                "folderPath": "/christmass",
+                                "name": "@{items('For_each')?['CreatedAtIso']}_@{items('For_each')?['OriginalTweet']?['TweetId']}.json",
+                                "queryParametersSingleEncoded": true
+                            }
+                        },
+                        "runAfter": {
+                            "Compose": [
+                                "Succeeded"
+                            ]
+                        },
+                        "runtimeConfiguration": {
+                            "contentTransfer": {
+                                "transferMode": "Chunked"
+                            }
+                        },
+                        "type": "ApiConnection"
+                    }
+                },
+                "foreach": "@body('Search_tweets')",
+                "runAfter": {
+                    "Search_tweets": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Foreach"
+            },
+            "Search_tweets": {
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['twitter']['connectionId']"
+                        }
+                    },
+                    "method": "get",
+                    "path": "/searchtweets",
+                    "queries": {
+                        "maxResults": 20,
+                        "searchQuery": "#christmasgifts"
+                    }
+                },
+                "runAfter": {},
+                "type": "ApiConnection"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "parameters": {
+            "$connections": {
+                "defaultValue": {},
+                "type": "Object"
+            }
+        },
+        "triggers": {
+            "Recurrence": {
+                "recurrence": {
+                    "frequency": "Day",
+                    "interval": 1
+                },
+                "type": "Recurrence"
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "value": {
+                "azureblob": {
+                    "connectionId": "/subscriptions/<Your-Subscrption>/resourceGroups/serverless/providers/Microsoft.Web/connections/azureblob",
+                    "connectionName": "azureblob",
+                    "id": "/subscriptions/<Your-Subscrption>/providers/Microsoft.Web/locations/westeurope/managedApis/azureblob"
+                },
+                "twitter": {
+                    "connectionId": "/subscriptions/<Your-Subscrption>/resourceGroups/serverless/providers/Microsoft.Web/connections/twitter",
+                    "connectionName": "twitter",
+                    "id": "/subscriptions/<Your-Subscrption>/providers/Microsoft.Web/locations/westeurope/managedApis/twitter"
+                }
+            }
+        }
+    }
+}

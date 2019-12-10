@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>Daily Deals</title>
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+
+</head>
+
+<body>
+  <div class="container mx-auto my-auto" id="container">
+      <br>
+      <h1 id="heading" class="display-4"></h1>
+  </div>
+</body>
+
+
+<script>
+
+        var today = new Date();
+        var todayString = moment(today).format('YYYY-MM-DD');
+        var container = document.getElementById("container");
+        var heading = document.getElementById("heading").innerHTML += `Deals for ${todayString}:`
+
+        async function getData(url) {
+            // Default options are marked with *
+            var response = await fetch(url, {
+                method: 'GET',
+                mode: "cors",
+                headers: {
+                    'Content-Type': 'text/xml',
+                },
+            });
+            var text = await response.text();
+            var doc = new window.DOMParser().parseFromString(text, "text/xml");
+            var blobs = doc.getElementsByTagName("EnumerationResults")[0].childNodes[2].getElementsByTagName("Blob");
+            for (var i = 0; i < blobs.length; i++) {              
+                var url =  blobs[i].childNodes[1].innerHTML;
+                var response = await fetch(url, {
+                    method: 'GET',
+                    mode: "cors",
+                    headers: {
+                    'Content-Type': 'application/json',
+                    },
+                });
+                var tweet = await response.json();
+
+                container.innerHTML +=  
+                    '<br>' +      
+                    '<div class="card" style="width: 50rem;">' +
+                    '<div class="card-body">'+
+                    `  <p class="card-text">${tweet.body}</p>` +
+                    '</div>';
+            } 
+        }
+    
+       
+        
+        getData('https://storageaccountserveabd8.blob.core.windows.net/christmass?restype=container&comp=list&prefix=' + todayString + '&maxresults=20');
+    </script>
+</html>
+    
