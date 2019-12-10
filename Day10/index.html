@@ -17,20 +17,18 @@
 <body>
   <div class="container mx-auto my-auto" id="container">
       <br>
-      <h1 id="heading" class="display-4"></h1>
+      <h1 id="header" class="display-4"></h1>
   </div>
 </body>
 
 
 <script>
-
-        var today = new Date();
-        var todayString = moment(today).format('YYYY-MM-DD');
-        var container = document.getElementById("container");
-        var heading = document.getElementById("heading").innerHTML += `Deals for ${todayString}:`
+        let today = new Date();
+        let todayString = moment(today).format('YYYY-MM-DD');
+        let container = document.getElementById("container");
+        document.getElementById("header").innerHTML += `Deals for ${todayString}:`
 
         async function getData(url) {
-            // Default options are marked with *
             var response = await fetch(url, {
                 method: 'GET',
                 mode: "cors",
