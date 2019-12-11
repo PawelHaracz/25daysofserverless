@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>Send e-Wish</title>
+
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.bundle.js" integrity="sha256-Z1t+wxZ7Eh5T1sK6aePWMhEQOghR4jZVLwjwrUZAReE=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <div class="container mx-auto my-auto" id="container">
+      <br>
+      <h1 id="header" class="display-4">
+          Sends e-Wish to Santa
+      </h1>
+      <form>
+        <div class="form-group">
+          <label for="whoInput">Your name</label>
+          <input type="text" class="form-control" id="whoInput">    
+        </div>
+        <div class="form-group">
+          <label for="typeInput">Kind of wish</label>
+          <input type="text" class="form-control" id="typeInput">
+        </div>
+        <div class="form-group">
+            <label for="descriptionInput">Describe what you want</label>
+            <input type="text" class="form-control" id="descriptionInput">
+          </div>
+        <div class="form-group">
+            <label for="addressInput">Your address</label>
+            <input type="text" class="form-control" id="addressInput">
+          </div>
+        <button id="wish-form" type="button" class="btn btn-primary">Submit</button>
+      </form>
+  </div>
+</body>
+
+
+<script>
+        async function postData(url = '', data = {}) {
+            const response = await fetch(url, {
+              method: 'POST',
+              mode: 'no-cors', 
+              cache: 'no-cache', 
+              credentials: 'same-origin', 
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              redirect: 'follow',
+              referrer: 'no-referrer',
+              body: JSON.stringify(data) 
+            });
+        }
+
+        $('#wish-form').on('click',function(event){
+          var json = {
+              who: $("#whoInput").val(),
+              type: $("#typeInput").val(),
+              description: $("#descriptionInput").val(),
+              address: $("#addressInput").val(),
+          };
+
+            var respone =  postData("https://day11ph.azurewebsites.net/api/wish", json)
+            .then(function(respone){
+                if(respone === undefined){
+                    alert("error, try again");
+                    return;
+                }
+                $("#whoInput").remove();
+                $("#typeInput").remove();
+                $("#descriptionInput").remove();
+                $("#addressInput").remove();
+            }).catch(function(error){
+                alert(error);
+            });
+        });
+</script>
+</html>
+    
