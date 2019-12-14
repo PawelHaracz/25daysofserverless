@@ -1,0 +1,12 @@
+{
+  "scriptFile": "__init__.py",
+  "bindings": [
+    {
+      "name": "myblob",
+      "direction": "in",
+      "type": "blobTrigger",
+      "path": "jokes/{name}",
+      "connection": "AzureWebJobsStorage"
+    }
+  ]
+}
