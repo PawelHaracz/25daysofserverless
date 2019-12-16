@@ -19,7 +19,7 @@ steps:
   inputs:
     command: build
     projects: '**/Day16.csproj'
-    arguments: '-c $(buildConfiguration) -o $(System.DefaultWorkingDirectory)' 
+    arguments: '-c $(buildConfiguration)' 
 - task: DotNetCoreCLI@2
   displayName: Publish
   inputs:
