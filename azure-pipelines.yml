@@ -15,12 +15,17 @@ variables:
 
 steps:
 - task: DotNetCoreCLI@2
+  displayName: Build
+  inputs:
+    command: build
+    projects: '**/Day16.csproj'
+    arguments: '-c $(buildConfiguration) -o $(System.DefaultWorkingDirectory)' 
+- task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
     publishWebProjects: true
-    arguments: '-c $(buildConfiguration)'
+    arguments: '-c $(buildConfiguration) --no-build'
     zipAfterPublish: true
-    projects: '**/Day16.csproj'
 
 - task: AzureResourceManagerTemplateDeployment@3
   inputs:
