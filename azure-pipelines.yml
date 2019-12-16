@@ -21,10 +21,12 @@ steps:
     projects: '**/Day16.csproj'
     arguments: '-c $(buildConfiguration) -o $(System.DefaultWorkingDirectory)' 
 - task: DotNetCoreCLI@2
+  displayName: Publish
   inputs:
     command: 'publish'
-    publishWebProjects: true
-    arguments: '-c $(buildConfiguration) --no-build'
+    projects: '**/Day16.csproj'
+    publishWebProjects: false
+    arguments: '-c $(buildConfiguration) --no-build --no-restore'
     zipAfterPublish: true
 
 - task: AzureResourceManagerTemplateDeployment@3
