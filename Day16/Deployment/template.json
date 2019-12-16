@@ -26,7 +26,7 @@
       }
     },
     "variables": {
-      "location": "West Europe",
+      "location": "[resourceGroup().location]",
       "functionAppName": "[parameters('appName')]",
       "hostingPlanName": "[parameters('appName')]",
       "applicationInsightsName": "[parameters('appName')]",
@@ -105,7 +105,7 @@
         "apiVersion": "2018-05-01-preview",
         "name": "[variables('applicationInsightsName')]",
         "type": "microsoft.insights/components",
-        "location": "variables('location')",
+        "location": "[variables('location')]",
         "tags": {
           "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('applicationInsightsName'))]": "Resource"
         },
