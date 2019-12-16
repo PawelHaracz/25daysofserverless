@@ -1,0 +1,42 @@
+# ASP.NET
+# Build and test ASP.NET projects.
+# Add steps that publish symbols, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  appName: 'Day16ph'
+
+steps:
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: '**/*Day16.csproj'
+    arguments: '-c $(buildConfiguration)'
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    azureResourceManagerConnection: 'Visual Studio Enterprise(5e73a2da-b3fe-4744-9b0b-a7709bf317f8)'
+    subscriptionId: '5e73a2da-b3fe-4744-9b0b-a7709bf317f8'
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: 'serverless'
+    location: 'West Europe'
+    templateLocation: 'Linked artifact'
+    csmFile: '**/Day16/Deployment/template.json'
+    csmParametersFile: '**/Day16/Deployment/template.parameters.json'
+    overrideParameters: '-appName $(appName)'
+    deploymentMode: 'Incremental'
+- task: AzureFunctionApp@1
+  inputs:
+    azureSubscription: 'Visual Studio Enterprise(5e73a2da-b3fe-4744-9b0b-a7709bf317f8)'
+    appType: 'functionApp'
+    appName: '$(appName)'
+    package: '$(System.DefaultWorkingDirectory)/**/*.zip'
+    deploymentMethod: 'zipDeploy'
