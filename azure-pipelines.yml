@@ -19,6 +19,9 @@ steps:
     command: 'publish'
     publishWebProjects: true
     arguments: '-c $(buildConfiguration)'
+    zipAfterPublish: true
+    projects: '**/Day16.csproj'
+
 - task: AzureResourceManagerTemplateDeployment@3
   inputs:
     deploymentScope: 'Resource Group'
