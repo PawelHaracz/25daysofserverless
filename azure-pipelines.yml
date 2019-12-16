@@ -17,8 +17,7 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
-    publishWebProjects: false
-    projects: '**/*Day16.csproj'
+    publishWebProjects: true
     arguments: '-c $(buildConfiguration)'
 - task: AzureResourceManagerTemplateDeployment@3
   inputs:
