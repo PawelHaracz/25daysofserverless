@@ -26,7 +26,7 @@
       }
     },
     "variables": {
-      "location": "[resourceGroup().location]",
+      "location": "West Europe",
       "functionAppName": "[parameters('appName')]",
       "hostingPlanName": "[parameters('appName')]",
       "applicationInsightsName": "[parameters('appName')]",
