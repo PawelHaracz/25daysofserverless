@@ -1,0 +1,88 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "Parse_JSON": {
+                "inputs": {
+                    "content": "@triggerBody()?['MessageText']",
+                    "schema": {
+                        "properties": {
+                            "devicidId": {
+                                "type": "string"
+                            },
+                            "risedAlarm": {
+                                "type": "boolean"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "runAfter": {},
+                "type": "ParseJson"
+            },
+            "Post_a_tweet": {
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['twitter']['connectionId']"
+                        }
+                    },
+                    "method": "post",
+                    "path": "/posttweet",
+                    "queries": {
+                        "tweetText": "#25DaysOfServerless Challange completed. Device @{body('Parse_JSON')?['devicidId']} rised a tempture alarm. To detect it used IoTHub, Python azure function, Azure queue and Logic App. Check GitHub https://github.com/PawelHaracz/25daysofserverless/tree/master/Day17 "
+                    }
+                },
+                "runAfter": {
+                    "Parse_JSON": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "ApiConnection"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "parameters": {
+            "$connections": {
+                "defaultValue": {},
+                "type": "Object"
+            }
+        },
+        "triggers": {
+            "When_there_are_messages_in_a_queue": {
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['azurequeues']['connectionId']"
+                        }
+                    },
+                    "method": "get",
+                    "path": "/@{encodeURIComponent('twitter')}/message_trigger"
+                },
+                "recurrence": {
+                    "frequency": "Minute",
+                    "interval": 3
+                },
+                "splitOn": "@triggerBody()?['QueueMessagesList']?['QueueMessage']",
+                "type": "ApiConnection"
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "value": {
+                "azurequeues": {
+                    "connectionId": "/subscriptions/<Your-Subscription>/resourceGroups/serverless/providers/Microsoft.Web/connections/azurequeues",
+                    "connectionName": "azurequeues",
+                    "id": "/subscriptions/<Your-Subscription>/providers/Microsoft.Web/locations/westeurope/managedApis/azurequeues"
+                },
+                "twitter": {
+                    "connectionId": "/subscriptions/<Your-Subscription>/resourceGroups/serverless/providers/Microsoft.Web/connections/twitter",
+                    "connectionName": "twitter",
+                    "id": "/subscriptions/<Your-Subscription>/providers/Microsoft.Web/locations/westeurope/managedApis/twitter"
+                }
+            }
+        }
+    }
+}
