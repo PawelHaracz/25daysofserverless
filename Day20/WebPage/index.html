@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+  <!-- Popper JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@aspnet/signalr@1.1.4/dist/browser/signalr.js"></script>
+  <script src="upload.js"></script>
+  <title>Validate Gift</title>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="text-center">
+      <video autoplay id="video" width="640" height="480"></video>
+      <canvas id="canvas" width="640" height="480"></canvas>
+    </div>
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <button id="snap" class="input-group-text">Take Photo</button>
+        <button id="retake" class="input-group-text">Retake Photo</button>
+        <form id="target" method="post" enctype="multipart/form-data">
+          <button id="submit" type="submit" class="input-group-text">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  </div>
+</body>
+
+</html>
