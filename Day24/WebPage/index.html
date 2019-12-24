@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Serverless Chat</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+  <!-- Popper JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@aspnet/signalr@1.1.4/dist/browser/signalr.js"></script>
+
+  <script>
+    const apiBaseUrl = 'https://24dayph.azurewebsites.net';
+    const authProvider = 'facebook'; // aad, twitter, microsoftaccount, google, facebook
+  </script>
+</head>
+
+<body>
+  <p>&nbsp;</p>
+  <div id="app" class="container">
+    <h3>Serverless gift validator</h3>
+    <div v-if="!isLocalhost">
+      <div v-if="authenticated">
+        You are logged in [<a href="#" v-on:click.prevent="logout">Logout</a>]
+      </div>
+      <div v-if="!authenticated">
+        <a href="#" v-on:click.prevent="login">Login</a>
+      </div>
+    </div>
+    <div class="row" v-if="(isLocalhost || authenticated) && ready">
+      <div class="container-fluid">
+        <div class="text-center">
+          <img src="" class="rounded" alt="" id="preview">
+        </div>
+        <form id="target" @submit="submited" enctype="multipart/form-data" >
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <button type="submit" class="input-group-text" id="inputGroupFileAddon01">
+                Upload
+              </button>
+            </div>
+            <div class="custom-file">
+              <input type="file" class="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01"
+                multiple  @change="processFile($event)" >
+              <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@aspnet/signalr@1.0.3/dist/browser/signalr.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios@0.18.0/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/timeago.js@3.0.2/dist/timeago.min.js"></script>
+
+  <script>
+    const axiosConfig = {
+      withCredentials: true
+    };
+    const hubName = 'chat';
+    const app = new Vue({
+      el: '#app',
+      data: function () {
+        return {
+          authenticated: false,
+          isLocalhost: /\/\/localhost/.test(apiBaseUrl),
+          username: '',
+          token: '',
+          ready: false,
+          files: [],
+          loginUrl: `${apiBaseUrl}/.auth/login/${authProvider}?post_login_redirect_url=${window.location.href}`,
+          logoutUrl: `${apiBaseUrl}/.auth/logout?post_logout_redirect_uri=${window.location.href}`
+        };
+      },
+      mounted: function() {
+        return this.getAuthInfo().then(function () {        
+          if (this.isLocalhost || this.authenticated) {
+            const connection = new signalR.HubConnectionBuilder()
+              .withUrl(`${apiBaseUrl}/api`)
+              .build();
+            connection.on('broadcastMessage', onNewMessage.bind(this));
+            connection.onclose(() => console.log('disconnected'));
+            console.log('connecting...');
+            connection.start()
+              .then(() => this.ready = true)
+              .catch(console.error);
+          }
+         
+          function onNewMessage(message) {
+            alert(`Processing image ${message.FileName} was done! Result is ${message.Result ? "positive" : "negative"}`);
+          }
+        }.bind(this));
+      },
+      methods: {
+        login: function () {
+          window.location.href = this.loginUrl;
+        },
+        logout: function () {
+          window.location.href = this.logoutUrl;
+        },
+        getAuthInfo: function () {
+          return axios.post(`${apiBaseUrl}/.auth/me`, null, axiosConfig)
+            .then((data) =>{ 
+              this.token = data.data[0].access_token;
+              this.username = data.data[0].user_id;
+              this.authenticated = true}, () => null);
+        },
+        submited : function(e) {
+           
+            e.preventDefault();
+                    
+            let formData = new FormData();
+        
+            for (let i = 0; i < this.files.length; i++) {
+              let file = this.files[i];
+        
+              formData.append('files[]', file);
+            }
+            debugger;
+            fetch(`${apiBaseUrl}/api/Gift`, {
+              method: 'POST',
+              headers: {
+                'Authorization' : 'Bearer ' + this.token,
+                'X-ZUMO-AUTH':  this.token,
+              },
+              body: formData,
+              mode: 'cors'
+            }).then(response => {
+              console.log(response);
+            })
+        },
+         processFile : function(event) {
+          this.files = event.target.files
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>
