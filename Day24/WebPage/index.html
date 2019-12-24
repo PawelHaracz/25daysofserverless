@@ -131,11 +131,8 @@
             debugger;
             fetch(`${apiBaseUrl}/api/Gift`, {
               method: 'POST',
-              headers: {
-                'Authorization' : 'Bearer ' + this.token,
-                'X-ZUMO-AUTH':  this.token,
-              },
               body: formData,
+              credentials: 'include',
               mode: 'cors'
             }).then(response => {
               console.log(response);
