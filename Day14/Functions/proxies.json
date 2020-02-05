@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json.schemastore.org/proxies",
+  "proxies": {
+    "api": {
+      "matchCondition": {
+        "route": "/api/{*restOfPath}"
+      },
+      "backendUri": "https://%WEBSITE_SITE_NAME%.azurewebsites.net/api/{restOfPath}"
+    },
+    "app": {
+      "matchCondition": {
+        "route": "{*restOfPath}"
+      },
+      "backendUri": "https://%AccountStorage-Name%.z6.web.core.windows.net/{restOfPath}"
+    }
+  }
+}
