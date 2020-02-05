@@ -16,9 +16,7 @@ namespace Day24
             HttpRequest req,
             [SignalRConnectionInfo(HubName = HubName,  UserId = "{headers.x-ms-client-principal-name}")]SignalRConnectionInfo info
         )
-        {
-            req.HttpContext.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
-            
+        {    
             return info != null
                 ? (ActionResult)new OkObjectResult(info)
                 : new NotFoundObjectResult("Failed to get SignalR connection information");
